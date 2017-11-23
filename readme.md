@@ -1,6 +1,6 @@
 # Optimizely X Node Client
 
-Access the [Optimizely REST v2 API][opt-api] via javascript
+Access the [Optimizely REST v2 API](opt-api) via javascript
 
 ### Installation
 
