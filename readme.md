@@ -27,7 +27,6 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
     return oc;
 });
 ```
-```
 
 ## Contributing
 
