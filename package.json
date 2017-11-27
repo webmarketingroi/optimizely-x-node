@@ -1,116 +1,25 @@
 {
-  "_args": [
-    [
-      "optimizely-node-client",
-      "/home/oleg/share/optimizely-node-client"
-    ]
+  "name": "optimizely-x-node",
+  "description": "Optimizely X Client for Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "keywords": [
+    "optimizely x",
+    "rest",
+    "api",
+    "client"
   ],
-  "_from": "optimizely-node-client@latest",
-  "_id": "optimizely-node-client@0.6.3",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/optimizely-node-client",
-  "_nodeVersion": "4.3.1",
-  "_npmOperationalInternal": {
-    "host": "packages-13-west.internal.npmjs.com",
-    "tmp": "tmp/optimizely-node-client-0.6.3.tgz_1457112038614_0.30816595116630197"
-  },
-  "_npmUser": {
-    "email": "nselvidge@gmail.com",
-    "name": "nselvidge"
-  },
-  "_npmVersion": "2.14.12",
-  "_phantomChildren": {},
-  "_requested": {
-    "name": "optimizely-node-client",
-    "raw": "optimizely-node-client",
-    "rawSpec": "",
-    "scope": null,
-    "spec": "latest",
-    "type": "tag"
-  },
-  "_requiredBy": [
-    "#USER"
-  ],
-  "_resolved": "https://registry.npmjs.org/optimizely-node-client/-/optimizely-node-client-0.6.3.tgz",
-  "_shasum": "f7550ecebdfb0a5103c50176f46c719d9c5294ef",
-  "_shrinkwrap": null,
-  "_spec": "optimizely-node-client",
-  "_where": "/home/oleg/share/optimizely-node-client",
-  "author": {
-    "email": "john@iamjohnhenry.com",
-    "name": "John Henry"
-  },
-  "bugs": {
-    "url": "https://github.com/funnelenvy/optimizely-node/issues"
-  },
-  "contributors": [
-    {
-      "name": "Nathan Selvidge",
-      "email": "nselvidge@gmail.com",
-      "url": "http://www.nathanselvidge.com"
-    },
-    {
-      "name": "Nathan Heaps",
-      "email": "nsheaps@gmail.com",
-      "url": "http://www.github.com/nsheaps"
-    },
-    {
-      "name": "James Marchant",
-      "email": "jwmarchant@gmail.com",
-      "url": "https://github.com/JWMarchant"
-    }
-  ],
+  "license": "MIT",
   "dependencies": {
     "bluebird": "^2.3.2",
     "lodash": "^2.4.1",
-    "query-string": "",
     "restler": "^3.2.2"
   },
-  "description": "Optimizely Client for Node",
   "devDependencies": {
     "hat": "0.0.3",
     "mocha": "^2.1.0",
     "nock": "^0.56.0"
-  },
-  "directories": {},
-  "dist": {
-    "shasum": "f7550ecebdfb0a5103c50176f46c719d9c5294ef",
-    "tarball": "https://registry.npmjs.org/optimizely-node-client/-/optimizely-node-client-0.6.3.tgz"
-  },
-  "gitHead": "0b607d27af1300fcaac7f4d978a563b3ddee7fc2",
-  "homepage": "https://github.com/funnelenvy/optimizely-node",
-  "keywords": [
-    "api",
-    "client",
-    "optimizely",
-    "rest"
-  ],
-  "license": "MIT",
-  "main": "index.js",
-  "maintainers": [
-    {
-      "name": "johnhenryenvy",
-      "email": "john@funnelenvy.com"
-    },
-    {
-      "name": "arunenvy",
-      "email": "arun@funnelenvy.com"
-    },
-    {
-      "name": "nselvidge",
-      "email": "nselvidge@gmail.com"
-    }
-  ],
-  "name": "optimizely-node-client",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/funnelenvy/optimizely-node.git"
-  },
-  "scripts": {
-    "test": "mocha test"
-  },
-  "version": "0.6.3"
+  }
 }
