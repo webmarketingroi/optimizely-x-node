@@ -2,8 +2,15 @@ var OptimizelyClient = require("../lib/OptimizelyClient");
 var hat = require("hat")
 var assert = require("assert");
 var nock = require("nock");
-var token = "84111b0b811e12e1543e6e53a672b5b3:f7534f87";
-
+var authCredentials = {
+    "clientId":"76459304171",
+    "clientSecret": "33nB8EY8NoSkQg9voK3LKk42Y1qCX776MMBfXAjdDU0",
+    "accessToken":"2:mny3yrqk5Jm20FzVcwm2bmaFf2JSj0yx3USnEEoHMji5q4yArT7E",
+    "refreshToken":"2:b1feae21497c4b01a632a40e64287d42",
+    "tokenType":"bearer",
+    "expiresIn":7300,
+    "accessTokenTimestamp":Math.round(+new Date()/1000)
+};
 var stripPathEnd = function(path) {
   var index = path.lastIndexOf("/");
   return path.substr(index + 1);
@@ -20,7 +27,7 @@ var DIMENSIONNAME = "DIMENSIONNAME";
 var GOALSNAME = "GOALSNAME";
 var EXPERIMENTDESCRIPTION = "DESCRIPTION OF EXPERIMENT";
 var VARIATIONDESCRIPTION = "DESCRIPTION OF VARIATION";
-var baseUrl = 'https://www.optimizelyapis.com/experiment/v1';
+var baseUrl = 'https://api.optimizely.com';
 var EDITURL = 'https://www.google.com';
 var FUNNELENVYERROR = "FunnelEnvy is not at fault. YOU did something bad.";
 var FAILUREMESSAGE = "This should not be successful";
@@ -33,34 +40,51 @@ var scope = nock(baseUrl);
 ////////////////
 //Tests
 ////////////////
-var client = new OptimizelyClient(token);
+var client = new OptimizelyClient(authCredentials);
+
 describe("Successful API Calls", function() {
   ////////////////
   //Project Tests
   ////////////////
   describe("Projects", function() {
-    scope.post('/projects/') //create
-      .reply(201, function(uri, requestBody) {
-        requestBody = JSON.parse(requestBody);
-        requestBody.id = PROJECTID;
-        return requestBody;
+      
+    scope.post('/v2/projects') //create
+      .reply(201, {
+          'id' : 1523456,
+          'account_id' : 54321,
+          'name' : 'Some Optimizely Project',
+          'is_classic' : true
       });
+      
     it('should create a project', function(done) {
       var options = {
-        "name": PROJECTNAME,
-        "status": "ACTIVE",
-        "ip_filter": "",
-        "include_jquery": false
-      }
+        'id' : 1523456,
+        'account_id' : 54321,
+        'name' : 'Some Optimizely Project',
+        'is_classic' : true,
+        'socket_token' : 'fwerw',            
+        'web_snippet' : {
+            "enable_force_variation" : false,
+            "exclude_disabled_experiments" : false,
+            "exclude_names" : true,
+            "include_jquery" : true,
+            "ip_anonymization" : false,
+            "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
+            "library" : "jquery-1.11.3-trim",
+            "project_javascript" : "alert(\"Active Experiment\")",
+            "code_revision" : 123456,
+            "js_file_size" : 5004
+        }
+      };
+      
       client.createProject(options)
         .then(
-          function(project) {
-            project = JSON.parse(project);
-            assert.equal(project.id, PROJECTID);
-            assert.equal(project.name, PROJECTNAME);
-            assert.equal(project.status, "ACTIVE");
-            assert.equal(project.include_jquery, false);
-            assert.equal(project.ip_filter, "");
+          function(data) {
+            var project = data.payload;
+            assert.equal(project.id, 1523456);
+            assert.equal(project.name, 'Some Optimizely Project');
+            assert.equal(project.is_classic, true);
+            assert.equal(project.account_id, "54321");
             done();
           },
           function(error) {
@@ -68,10 +92,12 @@ describe("Successful API Calls", function() {
           }
         )
     });
+    
     scope.get('/projects/' + PROJECTID) //get
       .reply(200, function(uri, requestBody) {
         return stripPathEnd(uri);
       });
+      
     it('should retrieve a project', function(done) {
       var options = {
         "id": PROJECTID
@@ -734,7 +760,7 @@ describe("Unsuccessful API Calls", function() {
   //Project Tests
   //////////////////
   describe("Projects", function() {
-    scope.post('/projects/') //create
+    scope.post('/v2/projects') //create
       .reply(400, function(uri, requestBody) {
         return {
           status: 400,
@@ -1188,6 +1214,7 @@ describe("Unsuccessful API Calls", function() {
             done();
           }
         )
+        
     });
   })
 })
