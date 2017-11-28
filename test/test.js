@@ -93,9 +93,12 @@ describe("Successful API Calls", function() {
         )
     });
     
-    scope.get('/projects/' + PROJECTID) //get
-      .reply(200, function(uri, requestBody) {
-        return stripPathEnd(uri);
+    scope.get('/v2/projects/' + PROJECTID) //get
+      .reply(200, {
+          'id' : PROJECTID,
+          'account_id' : 54321,
+          'name' : 'Some Optimizely Project',
+          'is_classic' : true
       });
       
     it('should retrieve a project', function(done) {
@@ -104,8 +107,8 @@ describe("Successful API Calls", function() {
       }
       client.getProject(options)
         .then(
-          function(id) {
-            assert.equal(id, options.id);
+          function(data) {
+            assert.equal(data.payload.id, options.id);
             done();
           },
           function(error) {
@@ -113,38 +116,47 @@ describe("Successful API Calls", function() {
           }
         )
     });
-    scope.put('/projects/' + PROJECTID) //update
-      .reply(202, function(uri, requestBody) {
-        requestBody.id = stripPathEnd(uri);
-        return requestBody;
+    
+    scope.put('/v2/projects/' + PROJECTID) //update
+      .reply(202, {
+          'id' : PROJECTID,
+          'account_id' : 54321,
+          'name' : 'Some Optimizely Project 2',
+          'is_classic' : true
       });
+      
     it('should update a project', function(done){
-      var newProjectName = PROJECTNAME + '2';
+      
+      var newProjectName = 'Some Optimizely Project 2';
+      
       var options = {
         'id': PROJECTID,
         'project_name': newProjectName
       }
-      client.updateProject(options).then(function(reply){
-        reply = JSON.parse(reply);
-        assert.equal(reply["id"], PROJECTID);
-        assert.equal(reply["project_name"], newProjectName);
+      
+      client.updateProject(options).then(function(data){
+        assert.equal(data.payload.id, PROJECTID);
+        assert.equal(data.payload.name, newProjectName);
         done();
       }, function (error){
         done(error);
       })
     });
-    scope.get('/projects/') //update
-      .reply(200, function(uri, requestBody) {
-        return [ {
-                  "project_id": PROJECTID,
-                  "project_name": PROJECTNAME
-                } ];
-      });
+    
+    scope.get('/v2/projects') //get
+      .reply(200, [
+        {
+          'id' : PROJECTID,
+          'account_id' : 54321,
+          'name' : 'Some Optimizely Project',
+          'is_classic' : true
+        }
+      ]);
+      
     it('should return a list of projects', function(done){
-      client.getProjects().then(function(reply){
-        reply = JSON.parse(reply);
-        assert.equal(reply[0].project_id, PROJECTID);
-        assert.equal(reply[0].project_name, PROJECTNAME);
+      client.getProjects({page:0}).then(function(reply){
+        assert.equal(reply[0].id, PROJECTID);
+        assert.equal(reply[0].name, 'Some Optimizely Project');
         done();
       }, function (error){
         done(error);
@@ -784,7 +796,7 @@ describe("Unsuccessful API Calls", function() {
           }
         )
     });
-    scope.get('/projects/' + PROJECTID) //get
+    scope.get('/v2/projects/' + PROJECTID) //get
       .reply(400, function(uri, requestBody) {
         return {
           status: 400,
@@ -798,7 +810,7 @@ describe("Unsuccessful API Calls", function() {
       }
       client.getProject(options)
         .then(
-          function(variation) {
+          function(data) {
             done(FAILUREMESSAGE);
           },
           function(error) {
