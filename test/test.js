@@ -168,27 +168,26 @@ describe("Successful API Calls", function() {
   //Experiment Tests
   //////////////////
   describe("Experiments", function() {
-    scope.post('/projects/' + PROJECTID + "/experiments/") //create
-      .reply(201, function(uri, requestBody) {
-        requestBody = JSON.parse(requestBody);
-        requestBody.id = EXPERIMENTID;
-        return requestBody;
+    scope.post("/v2/experiments") //create
+      .reply(201, {
+          
       });
     it('should create an experiment', function(done) {
       var options = {
         "project_id": PROJECTID,
-        "edit_url": EDITURL,
-        "custom_css": "/*css comment*/",
-        "custom_js": "//js comment"
+        "audience_ids" : [
+            1234,
+            1212,
+            1432
+        ],
+        "campaign_id" : 2000
       }
       client.createExperiment(options)
         .then(
-          function(experiment) {
-            experiment = JSON.parse(experiment);
+          function(data) {
+            var experiment = data.payload;
             assert.equal(experiment.id, EXPERIMENTID);
-            assert.equal(experiment.edit_url, EDITURL);
-            assert.equal(experiment.custom_css, "/*css comment*/");
-            assert.equal(experiment.custom_js, "//js comment");
+            assert.equal(experiment.campaign_id, 2000);
             done();
           },
           function(error) {
@@ -863,7 +862,7 @@ describe("Unsuccessful API Calls", function() {
   //Experiment Tests
   //////////////////
   describe("Experiments", function() {
-    scope.post('/projects/' + PROJECTID + "/experiments/") //create
+    scope.post('/v2/experiments') //create
       .reply(400, function(uri, requestBody) {
         return {
           status: 400,
