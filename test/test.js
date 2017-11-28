@@ -144,6 +144,7 @@ describe("Successful API Calls", function() {
     });
     
     scope.get('/v2/projects') //get
+      .query(function(actualFunction){return true;})
       .reply(200, [
         {
           'id' : PROJECTID,
@@ -155,8 +156,8 @@ describe("Successful API Calls", function() {
       
     it('should return a list of projects', function(done){
       client.getProjects({page:0}).then(function(reply){
-        assert.equal(reply[0].id, PROJECTID);
-        assert.equal(reply[0].name, 'Some Optimizely Project');
+        assert.equal(reply.payload[0].id, PROJECTID);
+        assert.equal(reply.payload[0].name, 'Some Optimizely Project');
         done();
       }, function (error){
         done(error);
@@ -790,7 +791,6 @@ describe("Unsuccessful API Calls", function() {
             done(FAILUREMESSAGE);
           },
           function(error) {
-            error = JSON.parse(error);
             assert.equal(error.message, FUNNELENVYERROR);
             done();
           }
@@ -814,13 +814,12 @@ describe("Unsuccessful API Calls", function() {
             done(FAILUREMESSAGE);
           },
           function(error) {
-            error = JSON.parse(error);
             assert.equal(error.message, FUNNELENVYERROR);
             done();
           }
         )
     });
-    scope.put('/projects/' + PROJECTID) //update
+    scope.put('/v2/projects/' + PROJECTID) //update
       .reply(400, function(uri, requestBody) {
         requestBody.id = stripPathEnd(uri);
         return {
@@ -838,12 +837,12 @@ describe("Unsuccessful API Calls", function() {
       client.updateProject(options).then(function(reply){
         done(FAILUREMESSAGE);
       }, function (error){
-        error = JSON.parse(error);
         assert.equal(error.message, FUNNELENVYERROR);
         done();
       })
     });
-    scope.get('/projects/') //update
+    scope.get('/v2/projects') //get
+      .query(function(actualQuery){return true})
       .reply(400, function(uri, requestBody) {
         return {
           status: 400,
@@ -852,10 +851,9 @@ describe("Unsuccessful API Calls", function() {
         };
       });
     it('should not return a list of projects', function(done){
-      client.getProjects().then(function(reply){
+      client.getProjects({page:0}).then(function(reply){
         done(FAILUREMESSAGE);
       }, function (error){
-        error = JSON.parse(error);
         assert.equal(error.message, FUNNELENVYERROR);
         done();
       });
