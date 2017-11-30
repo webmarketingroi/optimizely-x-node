@@ -1,7 +1,7 @@
 # Optimizely X Node Client
 
 A JavaScript/Node wrapper library for the Optimizely REST API v2.0 (https://developers.optimizely.com/rest/v2/), 
-proudly created and open sourced by Optimizely Solutions Partner, Web Marketing ROI.
+proudly created and open sourced by Optimizely Solutions Partner, [Web Marketing ROI](https://webmarketingroi.com.au).
 
 ### Installation
 
@@ -25,7 +25,7 @@ var authCredentials = {
 };
 
 // Or, if you use the "OAuth 2.0 implicit grant" or "Optimizely personal 
-// token", use the following array. Please note that personal tokens are not
+// token", use the following object. Please note that personal tokens are not
 // recommended to use in production environments.
 var authCredentials = {
     "accessToken" : "YOUR_ACCESS_TOKEN",
@@ -36,7 +36,7 @@ var oc = new OptimizelyClient(authCredentials);
 
 // Do something with the client.
 
-// Get the first page of projects, 25 projects per page
+// For example, get the first page of projects, 25 projects per page
 oc.getProjects({page: 1, per_page:25}).then(function(data){
     // Extract projects from the result. 
     // The result (the data variable) is an object containing the following fields:
@@ -48,9 +48,11 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
     // Dump the list of projects to the console
     console.log("%o", data.payload);
     
-    // When the client makes a request, it may get the new access token by the refresh token (if the existing access token already expired).
-    // When you are done with the client, you may save the (updated) oc.authCredentials to a file or database for later use.
-    // If you don't save the new credentials, the client will retrieve the new access token with each request (unneeded work). 
+    // When the client makes a request, it may get the new access token by the refresh token 
+    // (if the existing access token already expired). When you are done with the client, 
+    // you may save the (updated) oc.authCredentials to a file or database for later use.
+    // If you don't save the new credentials, the client will retrieve the new access token 
+    // with each request (unneeded work). 
     var fs = require('fs');
     fs.writeFile("auth_credentials.json", JSON.stringify(oc.authCredentials), function(err) {
         if(err) {
