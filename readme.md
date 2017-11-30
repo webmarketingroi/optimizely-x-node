@@ -50,8 +50,8 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
     
     // When the client makes a request, it may get the new access token by the refresh token 
     // (if the existing access token already expired). When you are done with the client, 
-    // you may save the (updated) oc.authCredentials to a file or database for later use.
-    // If you don't save the new credentials, the client will retrieve the new access token 
+    // you may save the (updated) oc.authCredentials to a file or database for later consuming by the client.
+    // If you don't save the new credentials/consume them to the client, the client will retrieve the new access token 
     // with each request (unneeded work). 
     var fs = require('fs');
     fs.writeFile("auth_credentials.json", JSON.stringify(oc.authCredentials), function(err) {
