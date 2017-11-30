@@ -19,6 +19,7 @@ var PROJECTID = hat();
 var EXPERIMENTID = hat();
 var VARIATIONID = hat();
 var AUDIENCEID = hat();
+var CAMPAIGNID = hat();
 var DIMENSIONID = hat();
 var GOALSID = hat();
 var PROJECTNAME = "PROJECTNAME";
@@ -350,37 +351,13 @@ describe("Successful API Calls", function() {
   //Audience Tests
   //////////////////
   describe("Audiences", function() {
-    /**
-     * Set up the Audience Test Paths here
-     */
-    before(function(){
-      scope.get('/audiences/' + AUDIENCEID) //get
-        .reply(200, function(uri, requestBody) {
-          return stripPathEnd(uri);
+    
+    scope.post('/v2/audiences') //create
+        .reply(201, {
+            "id": PROJECTID,
+            "name": AUDIENCENAME
         });
-      scope.post('/projects/' + PROJECTID + '/audiences/') //create
-        .reply(201, function(uri, requestBody) {
-          requestBody = JSON.parse(requestBody);
-          requestBody.id = AUDIENCEID;
-          return requestBody;
-        });
-      scope.put('/audiences/' + AUDIENCEID) //update
-        .reply(202, function(uri, requestBody) {
-          requestBody = JSON.parse(requestBody);
-          requestBody.id = AUDIENCEID;
-          return requestBody;
-        });
-      scope.get('/projects/' + PROJECTID + '/audiences/') //get 
-        .reply(200, function(uri, requestBody) {
-          return [ {
-                    "id": AUDIENCEID,
-                    "name": AUDIENCENAME
-                  } ];
-        });
-    });
-    /**
-     * Describe the Audience functions here
-     */
+    
     it('should create an audience', function(done) {
       var options = {
         "id": PROJECTID,
@@ -388,10 +365,8 @@ describe("Successful API Calls", function() {
       }
       client.createAudience(options)
         .then(
-          function(audience) {
-            audience = JSON.parse(audience);
-            assert.equal(audience.name,
-              AUDIENCENAME);
+          function(data) {
+            assert.equal(data.payload.name, AUDIENCENAME);
             done();
           },
           function(error) {
@@ -399,14 +374,26 @@ describe("Successful API Calls", function() {
           }
         )
     });
+    
+    scope.get('/v2/audiences/' + AUDIENCEID) //get
+        .reply(200, {
+            "project_id" : 1000,
+            "archived" : false,
+            "description" : "People that speak spanish and are in San Francisco",
+            "name" : "Spanish speaking San Franciscans",
+            "segmentation" : true,
+            "created" : "2016-10-18T05:07:04.073Z",
+            "id" : AUDIENCEID
+        });
+      
     it('should get an audience', function(done) {
       var options = {
         "id": AUDIENCEID
       }
       client.getAudience(options)
         .then(
-          function(id) {
-            assert.equal(id, AUDIENCEID);
+          function(data) {
+            assert.equal(data.payload.id, AUDIENCEID);
             done();
           },
           function(error) {
@@ -414,17 +401,28 @@ describe("Successful API Calls", function() {
           }
         )
     });
+    
+    scope.put('/v2/audiences/' + AUDIENCEID) //update
+        .reply(202, {
+            "project_id" : 1000,
+            "archived" : false,
+            "description" : "New description",
+            "name" : "Spanish speaking San Franciscans",
+            "segmentation" : true,
+            "created" : "2016-10-18T05:07:04.073Z",
+            "id" : AUDIENCEID
+        });
+        
     it('should update a audience', function(done) {
       var options = {
         "id": AUDIENCEID,
-        "name": "New " + AUDIENCENAME
+        "description": "New description"
       }
+      
       client.updateAudience(options)
         .then(
-          function(audience) {
-            audience = JSON.parse(audience);
-            assert.equal(audience.name,
-              "New " + AUDIENCENAME);
+          function(data) {
+            assert.equal(data.payload.description, "New description");
             done();
           },
           function(error) {
@@ -432,14 +430,23 @@ describe("Successful API Calls", function() {
           }
         )
     });
+    
+    scope.get('/v2/audiences') //get 
+        .query(function(actualQuery){return true;})
+        .reply(200, function(uri, requestBody) {
+          return [ {
+                    "id": AUDIENCEID,
+                    "name": AUDIENCENAME
+                  } ];
+        });
+        
     it('should return a list of audiences', function(done){
       var options = {
         "id": PROJECTID
       }
-      client.getAudiences(options).then(function(reply){
-        reply = JSON.parse(reply);
-        assert.equal(reply[0].id, AUDIENCEID);
-        assert.equal(reply[0].name, AUDIENCENAME);
+      client.getAudiences(options).then(function(data){
+        assert.equal(data.payload[0].id, AUDIENCEID);
+        assert.equal(data.payload[0].name, AUDIENCENAME);
         done();
       }, function (error){
         done(error);
@@ -447,10 +454,160 @@ describe("Successful API Calls", function() {
     });
   })
   
+  //////////////////
+  //Campaign Tests
+  //////////////////
+  describe("Campaigns", function() {
+    
+    scope.post('/v2/campaigns') //create
+        .query(function(actualQuery){return true;})
+        .reply(201, {
+            "project_id" : PROJECTID,
+            "name" : "Landing Page Optimization",
+            "page_ids" : [
+              0
+            ],
+            "status" : "active",
+            "type" : "a/b",
+            "id" : CAMPAIGNID
+        });
+    
+    it('should create a campaign', function(done) {
+      var options = {
+        "action": "publish"
+      }
+      var campaign = {
+           "project_id" : PROJECTID,
+            "name" : "Landing Page Optimization",
+            "page_ids" : [
+              0
+            ],
+            "type" : "a/b"
+      };
+      
+      client.createCampaign(options, campaign)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Landing Page Optimization");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/campaigns/' + CAMPAIGNID) //get
+        .reply(200, {
+            "project_id" : PROJECTID,
+            "name" : "Landing Page Optimization",
+            "page_ids" : [
+              0
+            ],
+            "status" : "active",
+            "type" : "a/b",
+            "id" : CAMPAIGNID
+        });
+      
+    it('should get a campaign', function(done) {
+      var options = {
+        "id": CAMPAIGNID
+      }
+      client.getCampaign(options)
+        .then(
+          function(data) {
+            assert.equal(data.payload.id, CAMPAIGNID);
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.put('/v2/campaigns/' + CAMPAIGNID) //update
+        .query(function(actualQuery){return true;})
+        .reply(202, {
+            "project_id" : PROJECTID,
+            "name" : "New name",
+            "page_ids" : [
+              0
+            ],
+            "status" : "active",
+            "type" : "a/b",
+            "id" : CAMPAIGNID
+        });
+        
+    it('should update a campaign', function(done) {
+      var options = {
+        "campaign_id": CAMPAIGNID,
+        "action" : "publish"
+      }
+      
+      var campaign = {
+          "name":"New name"
+      };
+      
+      client.updateCampaign(options, campaign)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "New name");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/campaigns') //get 
+        .query(function(actualQuery){return true;})
+        .reply(200, function(uri, requestBody) {
+          return [ {
+                    "id": CAMPAIGNID,
+                    "name": "Landing Page Optimization"
+                  } ];
+        });
+        
+    it('should return a list of campaigns', function(done){
+      var options = {
+        "id": PROJECTID
+      }
+      client.getCampaigns(options).then(function(data){
+        assert.equal(data.payload[0].id, CAMPAIGNID);
+        assert.equal(data.payload[0].name, "Landing Page Optimization");
+        done();
+      }, function (error){
+        done(error);
+      })
+    });
+    
+    scope.intercept('/v2/campaigns/' + CAMPAIGNID, 'DELETE') 
+      .reply(204, function(uri, requestBody) {
+        return requestBody;
+      });
+      
+    it('should delete a campaign', function(done) {
+      var options = {
+        "id": CAMPAIGNID
+      };
+      client.deleteCampaign(options)
+        .then(
+          function(reply) {
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+  })
   
 })
 
-
+  
+  
 ////////////////////////
 //Unsuccessful API Tests
 ////////////////////////
