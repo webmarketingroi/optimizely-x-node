@@ -20,8 +20,8 @@ var EXPERIMENTID = hat();
 var VARIATIONID = hat();
 var AUDIENCEID = hat();
 var CAMPAIGNID = hat();
-var DIMENSIONID = hat();
-var GOALSID = hat();
+var PAGEID = hat();
+var EVENTID = hat();
 var PROJECTNAME = "PROJECTNAME";
 var AUDIENCENAME = "AUDIENCENAME";
 var DIMENSIONNAME = "DIMENSIONNAME";
@@ -517,6 +517,197 @@ describe("Successful API Calls", function() {
         .then(
           function(data) {
             assert.equal(data.payload.id, CAMPAIGNID);
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.put('/v2/campaigns/' + CAMPAIGNID) //update
+        .query(function(actualQuery){return true;})
+        .reply(202, {
+            "project_id" : PROJECTID,
+            "name" : "New name",
+            "page_ids" : [
+              0
+            ],
+            "status" : "active",
+            "type" : "a/b",
+            "id" : CAMPAIGNID
+        });
+        
+    it('should update a campaign', function(done) {
+      var options = {
+        "campaign_id": CAMPAIGNID,
+        "action" : "publish"
+      }
+      
+      var campaign = {
+          "name":"New name"
+      };
+      
+      client.updateCampaign(options, campaign)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "New name");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/campaigns') //get 
+        .query(function(actualQuery){return true;})
+        .reply(200, function(uri, requestBody) {
+          return [ {
+                    "id": CAMPAIGNID,
+                    "name": "Landing Page Optimization"
+                  } ];
+        });
+        
+    it('should return a list of campaigns', function(done){
+      var options = {
+        "id": PROJECTID
+      }
+      client.getCampaigns(options).then(function(data){
+        assert.equal(data.payload[0].id, CAMPAIGNID);
+        assert.equal(data.payload[0].name, "Landing Page Optimization");
+        done();
+      }, function (error){
+        done(error);
+      })
+    });
+    
+    scope.intercept('/v2/campaigns/' + CAMPAIGNID, 'DELETE') 
+      .reply(204, function(uri, requestBody) {
+        return requestBody;
+      });
+      
+    it('should delete a campaign', function(done) {
+      var options = {
+        "id": CAMPAIGNID
+      };
+      client.deleteCampaign(options)
+        .then(
+          function(reply) {
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+  })
+  
+  
+  //////////////////
+  //Event Tests
+  //////////////////
+  describe("Events", function() {
+    
+    scope.post('/v2/pages/'+PAGEID+'/events') //create
+        .query(function(actualQuery){return true;})
+        .reply(201, {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart",
+            "page_id" : PAGEID,
+            "project_id" : PROJECTID,
+            "id" : EVENTID,
+            "is_classic" : false,
+            "is_editable" : true
+        });
+    
+    it('should create an in-page event', function(done) {
+      var event = {
+           "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart",
+            "page_id" : PAGEID,
+            "project_id" : PROJECTID,
+            "is_classic" : false,
+            "is_editable" : true
+      };
+      
+      client.createInPageEvent(event)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Add to Cart");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.post('/v2/projects/'+PROJECTID+'/custom_events') //create
+        .query(function(actualQuery){return true;})
+        .reply(201, {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart",
+            "project_id" : PROJECTID,
+            "id" : EVENTID,
+            "is_classic" : false,
+            "is_editable" : true
+        });
+    
+    it('should create a custom event', function(done) {
+      var event = {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart",
+            "project_id" : PROJECTID,
+            "is_classic" : false,
+            "is_editable" : true
+      };
+      
+      client.createCustomEvent(event)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Add to Cart");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/events/' + EVENTID) //get
+        .reply(200, {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart",
+            "project_id" : PROJECTID,
+            "is_classic" : false,
+            "is_editable" : true
+        });
+      
+    it('should get an event', function(done) {
+      var options = {
+        "id": EVENTID
+      }
+      client.getEvent(options)
+        .then(
+          function(data) {
+            assert.equal(data.payload.id, EVENTID);
             done();
           },
           function(error) {
