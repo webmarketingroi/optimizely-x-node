@@ -64,9 +64,9 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
 }.bind(oc));
 ```
 
-## Tests
+## Running Unit Tests
 
-To run the unit tests, use the following command:
+This library uses Mocha for testing. To run unit tests, use the following command:
 
 `npm test`
 
