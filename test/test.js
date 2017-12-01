@@ -1393,19 +1393,13 @@ describe("Unsuccessful API Calls", function() {
 ////////////////////////
 describe("Integration Tests", function() {
   
-  nock.cleanAll();
-  nock.enableNetConnect();
-  
-  this.timeout(30000);
-
   beforeEach(function(){
     var runIntegrationTests = process.env.OPTIMIZELY_X_NODE_TEST_INTEGRATION;
     if (!runIntegrationTests)
-      return false;  
+      return false;
   });
   
   var realAuthCredentials = JSON.parse(fs.readFileSync('./test/auth_credentials.json', 'utf8'));
-  var client = new OptimizelyClient(realAuthCredentials);
     
   //////////////////
   //Project Tests
@@ -1413,7 +1407,14 @@ describe("Integration Tests", function() {
   describe("Projects", function() {
     
     it('should create a real project', function(done) {
-        
+
+        nock.cleanAll();
+        nock.enableNetConnect();
+  
+        this.timeout(30000);
+
+        var client = new OptimizelyClient(realAuthCredentials);
+     
         // Create new project        
         var curDate = new Date().toString('yyyy-mm-dd-HH-MM-ss');
         var newProject = {
