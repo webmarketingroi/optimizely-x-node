@@ -41,6 +41,7 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
     // Extract projects from the result. 
     // The result (the data variable) is an object containing the following fields:
     // - `url` - the URL of the request
+    // - `statusCode` - the response status code (e.g. 200)
     // - `headers` - the response headers
     // - `meta` - parsed headers (used for pagination and rate limiting)
     // - `payload` - the array of projects

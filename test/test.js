@@ -1,16 +1,20 @@
 var OptimizelyClient = require("../lib/OptimizelyClient");
+var fs = require('fs');
 var hat = require("hat")
 var assert = require("assert");
 var nock = require("nock");
+var xdate = require('x-date');
+
 var authCredentials = {
-    "clientId":"76459304171",
-    "clientSecret": "33nB8EY8NoSkQg9voK3LKk42Y1qCX776MMBfXAjdDU0",
-    "accessToken":"2:mny3yrqk5Jm20FzVcwm2bmaFf2JSj0yx3USnEEoHMji5q4yArT7E",
-    "refreshToken":"2:b1feae21497c4b01a632a40e64287d42",
+    "clientId":"76459304172",
+    "clientSecret": "13nB8EY8NoSkQg9voK3LKk42Y1qCX776MMBfXAjdDU0",
+    "accessToken":"1:mny3yrqk5Jm20FzVcwm2bmaFf2JSj0yx3USnEEoHMji5q4yArT7E",
+    "refreshToken":"3:b1feae21497c4b01a632a40e64287d42",
     "tokenType":"bearer",
     "expiresIn":7300,
     "accessTokenTimestamp":Math.round(+new Date()/1000)
 };
+
 var stripPathEnd = function(path) {
   var index = path.lastIndexOf("/");
   return path.substr(index + 1);
@@ -1382,5 +1386,56 @@ describe("Unsuccessful API Calls", function() {
       });
   })
   
+  ////////////////////////
+//Integration Tests
+////////////////////////
+describe("Integration Tests", function() {
+  
+  beforeEach(function(){
+    var runIntegrationTests = process.env.OPTIMIZELY_X_NODE_TEST_INTEGRATION;
+    if (!runIntegrationTests)
+      return false;  
+  }
+  
+  var realAuthCredentials = JSON.parse(fs.readFileSync('auth_credentials.json', 'utf8'));
+  var client = new OptimizelyClient(realAuthCredentials);
+    
+  //////////////////
+  //Project Tests
+  //////////////////
+  describe("Projects", function() {
+    
+    it('should create a real project', function(done) {
+        
+        // Create new project        
+        var curDate = new XDate().toString('yyyy-mm-dd-HH-MM-ss');
+        var newProject = {
+            "name" : "Test Project " + curDate,
+            "account_id" : 12345,
+            "confidence_threshold" : 0.9,
+            "platform" : "web",
+            "status" : "active",
+            "web_snippet" : {
+              "enable_force_variation" : false,
+              "exclude_disabled_experiments" : false,
+              "exclude_names" : true,
+              "include_jquery" : true,
+              "ip_anonymization" : false,
+              "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
+              "library" : "jquery-1.11.3-trim",
+              "project_javascript" : "alert(\"Active Experiment\")"
+            }
+        };
+        
+      client.createProject(newProject)
+        .then(function(data) {
+            assert.equals(data.payload.name, "Test Project " + curDate);
+            done();
+        });
+          
+    });
+    
+  });
+
   
 });
