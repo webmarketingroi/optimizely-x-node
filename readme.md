@@ -69,6 +69,7 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
 
 ### Creating a Project
 
+```
 var newProject = {
     "name" : "Some Project",
     "account_id" : 12345,
@@ -92,14 +93,17 @@ oc.createProject(newProject)
       // The following will dump the data of the newly create project
       console.log("%o", data.payload);
   });
+```
   
 ### Reading a Project
 
+```
 oc.getProject({id: 123456})
   .then(function(data) {
       // The following will output the data of the project with ID 123456
       console.log("%o", data.payload);
   });
+```
 
 ## Running Unit Tests
 
