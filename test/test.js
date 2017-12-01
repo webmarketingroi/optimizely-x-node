@@ -626,6 +626,10 @@ describe("Successful API Calls", function() {
         });
     
     it('should create an in-page event', function(done) {
+      var options = {
+          page_id: PAGEID
+      };
+      
       var event = {
            "archived" : true,
             "category" : "add_to_cart",
@@ -638,7 +642,7 @@ describe("Successful API Calls", function() {
             "is_editable" : true
       };
       
-      client.createInPageEvent(event)
+      client.createInPageEvent(options, event)
         .then(
           function(data) {
             assert.equal(data.payload.name, "Add to Cart");
@@ -665,6 +669,10 @@ describe("Successful API Calls", function() {
         });
     
     it('should create a custom event', function(done) {
+      var options = {
+          project_id : PROJECTID
+      };
+      
       var event = {
             "archived" : true,
             "category" : "add_to_cart",
@@ -676,7 +684,7 @@ describe("Successful API Calls", function() {
             "is_editable" : true
       };
       
-      client.createCustomEvent(event)
+      client.createCustomEvent(options, event)
         .then(
           function(data) {
             assert.equal(data.payload.name, "Add to Cart");
@@ -697,7 +705,8 @@ describe("Successful API Calls", function() {
             "name" : "Add to Cart",
             "project_id" : PROJECTID,
             "is_classic" : false,
-            "is_editable" : true
+            "is_editable" : true,
+            "id": EVENTID
         });
       
     it('should get an event', function(done) {
@@ -716,33 +725,34 @@ describe("Successful API Calls", function() {
         )
     });
     
-    scope.put('/v2/campaigns/' + CAMPAIGNID) //update
+    scope.put('/v2/pages/' + PAGEID + '/events/' + EVENTID) //update
         .query(function(actualQuery){return true;})
         .reply(202, {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart 2",
             "project_id" : PROJECTID,
-            "name" : "New name",
-            "page_ids" : [
-              0
-            ],
-            "status" : "active",
-            "type" : "a/b",
-            "id" : CAMPAIGNID
+            "is_classic" : false,
+            "is_editable" : true,
+            "id": EVENTID
         });
         
-    it('should update a campaign', function(done) {
+    it('should update an in-page event', function(done) {
       var options = {
-        "campaign_id": CAMPAIGNID,
-        "action" : "publish"
+        "page_id" : PAGEID,
+        "event_id" : EVENTID
       }
       
-      var campaign = {
-          "name":"New name"
+      var event = {
+          "name":"Add to cart 2"
       };
       
-      client.updateCampaign(options, campaign)
+      client.updateInPageEvent(options, event)
         .then(
           function(data) {
-            assert.equal(data.payload.name, "New name");
+            assert.equal(data.payload.name, "Add to Cart 2");
             done();
           },
           function(error) {
@@ -751,38 +761,95 @@ describe("Successful API Calls", function() {
         )
     });
     
-    scope.get('/v2/campaigns') //get 
+    scope.put('/v2/projects/' + PROJECTID + '/custom_events/' + EVENTID) //update
+        .query(function(actualQuery){return true;})
+        .reply(202, {
+            "archived" : true,
+            "category" : "add_to_cart",
+            "description" : "Item added to cart",
+            "event_type" : "custom",
+            "name" : "Add to Cart 2",
+            "project_id" : PROJECTID,
+            "is_classic" : false,
+            "is_editable" : true,
+            "id": EVENTID
+        });
+        
+    it('should update a custom event', function(done) {
+      var options = {
+        "project_id" : PROJECTID,
+        "event_id" : EVENTID
+      }
+      
+      var event = {
+          "name":"Add to cart 2"
+      };
+      
+      client.updateCustomEvent(options, event)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Add to Cart 2");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/events') //get 
         .query(function(actualQuery){return true;})
         .reply(200, function(uri, requestBody) {
           return [ {
-                    "id": CAMPAIGNID,
-                    "name": "Landing Page Optimization"
+                    "project_id" : PROJECTID,
+                    "id" : EVENTID
                   } ];
         });
         
-    it('should return a list of campaigns', function(done){
+    it('should return a list of events', function(done){
       var options = {
-        "id": PROJECTID
+        "project_id": PROJECTID
       }
-      client.getCampaigns(options).then(function(data){
-        assert.equal(data.payload[0].id, CAMPAIGNID);
-        assert.equal(data.payload[0].name, "Landing Page Optimization");
+      client.getEvents(options).then(function(data){
+        assert.equal(data.payload[0].id, EVENTID);
         done();
       }, function (error){
         done(error);
       })
     });
     
-    scope.intercept('/v2/campaigns/' + CAMPAIGNID, 'DELETE') 
+    scope.intercept('/v2/pages/' + PAGEID + '/events/' + EVENTID, 'DELETE') 
       .reply(204, function(uri, requestBody) {
         return requestBody;
       });
       
-    it('should delete a campaign', function(done) {
+    it('should delete an in-page event', function(done) {
       var options = {
-        "id": CAMPAIGNID
+        "page_id":PAGEID,
+        "event_id":EVENTID
       };
-      client.deleteCampaign(options)
+      client.deleteInPageEvent(options)
+        .then(
+          function(reply) {
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.intercept('/v2/projects/' + PROJECTID + '/custom_events/' + EVENTID, 'DELETE') 
+      .reply(204, function(uri, requestBody) {
+        return requestBody;
+      });
+      
+    it('should delete a custom event', function(done) {
+      var options = {
+        "project_id":PROJECTID,
+        "event_id":EVENTID
+      };
+      client.deleteCustomEvent(options)
         .then(
           function(reply) {
             done();
