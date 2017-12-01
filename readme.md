@@ -65,11 +65,57 @@ oc.getProjects({page: 1, per_page:25}).then(function(data){
 }.bind(oc));
 ```
 
+## More Examples
+
+### Creating a Project
+
+var newProject = {
+    "name" : "Some Project",
+    "account_id" : 12345,
+    "confidence_threshold" : 0.9,
+    "platform" : "web",
+    "status" : "active",
+    "web_snippet" : {
+      "enable_force_variation" : false,
+      "exclude_disabled_experiments" : false,
+      "exclude_names" : true,
+      "include_jquery" : true,
+      "ip_anonymization" : false,
+      "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
+      "library" : "jquery-1.11.3-trim",
+      "project_javascript" : "alert(\"Active Experiment\")"
+    }
+};
+
+oc.createProject(newProject)
+  .then(function(data) {
+      // The following will dump the data of the newly create project
+      console.log("%o", data.payload);
+  });
+  
+### Reading a Project
+
+oc.getProject({id: 123456})
+  .then(function(data) {
+      // The following will output the data of the project with ID 123456
+      console.log("%o", data.payload);
+  });
+
 ## Running Unit Tests
 
 This library uses Mocha for testing. To run unit tests, use the following command:
 
 `npm test`
+
+If you want to run integration tests against a real Optimizely account, rename `test/auth_credentials.json.dist` 
+to `test/auth_credentials.json` and type your credentials in that file. Then, create the 
+`OPTIMIZELY_X_NODE_TEST_INTEGRATION` environment variable as follows
+
+```
+export OPTIMIZELY_PHP_TEST_INTEGRATION=1
+```
+
+and then run unit tests.
 
 ## Copyright and license
 

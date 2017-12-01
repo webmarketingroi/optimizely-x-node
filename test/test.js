@@ -1396,53 +1396,87 @@ describe("Integration Tests", function() {
   beforeEach(function(){
     var runIntegrationTests = process.env.OPTIMIZELY_X_NODE_TEST_INTEGRATION;
     if (!runIntegrationTests)
-      return false;
+      this.skip();
   });
   
   var realAuthCredentials = JSON.parse(fs.readFileSync('./test/auth_credentials.json', 'utf8'));
     
-  //////////////////
-  //Project Tests
-  //////////////////
-  describe("Projects", function() {
+  it('should create a real project', function(done) {
+
+    nock.cleanAll();
+    nock.enableNetConnect();
+
+    this.timeout(30000);
+
+    var client = new OptimizelyClient(realAuthCredentials);
+ 
+    // Create new project        
+    var curDate = new Date().toString('yyyy-mm-dd-HH-MM-ss');
+    var newProject = {
+        "name" : "Test Project " + curDate,
+        "account_id" : 12345,
+        "confidence_threshold" : 0.9,
+        "platform" : "web",
+        "status" : "active",
+        "web_snippet" : {
+          "enable_force_variation" : false,
+          "exclude_disabled_experiments" : false,
+          "exclude_names" : true,
+          "include_jquery" : true,
+          "ip_anonymization" : false,
+          "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
+          "library" : "jquery-1.11.3-trim",
+          "project_javascript" : "alert(\"Active Experiment\")"
+        }
+    };
     
-    it('should create a real project', function(done) {
-
-        nock.cleanAll();
-        nock.enableNetConnect();
-  
-        this.timeout(30000);
-
-        var client = new OptimizelyClient(realAuthCredentials);
-     
-        // Create new project        
-        var curDate = new Date().toString('yyyy-mm-dd-HH-MM-ss');
-        var newProject = {
-            "name" : "Test Project " + curDate,
-            "account_id" : 12345,
-            "confidence_threshold" : 0.9,
-            "platform" : "web",
-            "status" : "active",
-            "web_snippet" : {
-              "enable_force_variation" : false,
-              "exclude_disabled_experiments" : false,
-              "exclude_names" : true,
-              "include_jquery" : true,
-              "ip_anonymization" : false,
-              "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
-              "library" : "jquery-1.11.3-trim",
-              "project_javascript" : "alert(\"Active Experiment\")"
-            }
-        };
-        
-      client.createProject(newProject)
-        .then(function(data) {
-            assert.equal(data.payload.name, "Test Project " + curDate);
-            done();
-        });
-          
+  client.createProject(newProject)
+    .then(function(data) {
+        assert.equal(data.payload.name, "Test Project " + curDate);
+        done();
     });
+    
   });
+  
+  /*it('should create a real experiment', function(done) {
+
+    nock.cleanAll();
+    nock.enableNetConnect();
+
+    this.timeout(30000);
+
+    var client = new OptimizelyClient(realAuthCredentials);
+ 
+    // Create new project        
+    var curDate = new Date().toString('yyyy-mm-dd-HH-MM-ss');
+    var newProject = {
+        "name" : "Test Project " + curDate,
+        "account_id" : 12345,
+        "confidence_threshold" : 0.9,
+        "platform" : "web",
+        "status" : "active",
+        "web_snippet" : {
+          "enable_force_variation" : false,
+          "exclude_disabled_experiments" : false,
+          "exclude_names" : true,
+          "include_jquery" : true,
+          "ip_anonymization" : false,
+          "ip_filter" : "^206\\.23\\.100\\.([5-9][0-9]|1([0-4][0-9]|50))$",
+          "library" : "jquery-1.11.3-trim",
+          "project_javascript" : "alert(\"Active Experiment\")"
+        }
+    };
+    
+    client.createProject(newProject)
+    .then(function(data) {
+        assert.equal(data.payload.name, "Test Project " + curDate);
+        Promise.resolve(client);
+    }.bind(client)).then(function(client){
+        
+        client.createExperiment({project_id:})
+    });
+  
+  });*/
     
 });
   
