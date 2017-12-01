@@ -112,7 +112,7 @@ to `test/auth_credentials.json` and type your credentials in that file. Then, cr
 `OPTIMIZELY_X_NODE_TEST_INTEGRATION` environment variable as follows
 
 ```
-export OPTIMIZELY_PHP_TEST_INTEGRATION=1
+export OPTIMIZELY_X_NODE_TEST_INTEGRATION=1
 ```
 
 and then run unit tests.
