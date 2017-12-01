@@ -604,6 +604,141 @@ describe("Successful API Calls", function() {
     
   })
   
+  //////////////////
+  //Page Tests
+  //////////////////
+  describe("Pages", function() {
+    
+    scope.post('/v2/pages') //create
+        .query(function(actualQuery){return true;})
+        .reply(201, {
+            "edit_url" : "https://www.optimizely.com",
+            "name" : "Home Page",
+            "project_id" : PROJECTID,
+            "page_type" : "single_url",
+            "id" : PAGEID
+        });
+    
+    it('should create a page', function(done) {
+      var page = {
+           "edit_url" : "https://www.optimizely.com",
+           "name" : "Home Page",
+           "project_id" : PROJECTID,
+           "page_type" : "single_url",
+      };
+      
+      client.createPage(page)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Home Page");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/pages/' + PAGEID) //get
+        .reply(200, {
+           "edit_url" : "https://www.optimizely.com",
+           "name" : "Home Page",
+           "project_id" : PROJECTID,
+           "page_type" : "single_url",
+           "id" : PAGEID
+        });
+      
+    it('should get a page', function(done) {
+      var options = {
+        "id": PAGEID
+      }
+      client.getPage(options)
+        .then(
+          function(data) {
+            assert.equal(data.payload.id, PAGEID);
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.put('/v2/pages/' + PAGEID) //update
+        .query(function(actualQuery){return true;})
+        .reply(202, {
+            "edit_url" : "https://www.optimizely.com",
+           "name" : "Home Page 2",
+           "project_id" : PROJECTID,
+           "page_type" : "single_url",
+           "id" : PAGEID
+        });
+        
+    it('should update a page', function(done) {
+      var options = {
+        "id": PAGEID
+      }
+      
+      var page = {
+          "name":"Home Page 2"
+      };
+      
+      client.updatePage(options, page)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Home Page 2");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/pages') //get 
+        .query(function(actualQuery){return true;})
+        .reply(200, function(uri, requestBody) {
+          return [ {
+                    "id": PAGEID,
+                    "name": "Home Page"
+                  } ];
+        });
+        
+    it('should return a list of pages', function(done){
+      var options = {
+        "id": PROJECTID
+      }
+      client.getPages(options).then(function(data){
+        assert.equal(data.payload[0].id, PAGEID);
+        assert.equal(data.payload[0].name, "Home Page");
+        done();
+      }, function (error){
+        done(error);
+      })
+    });
+    
+    scope.intercept('/v2/pages/' + PAGEID, 'DELETE') 
+      .reply(204, function(uri, requestBody) {
+        return requestBody;
+      });
+      
+    it('should delete a page', function(done) {
+      var options = {
+        "id": PAGEID
+      };
+      client.deletePage(options)
+        .then(
+          function(reply) {
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+  })
+  
   
   //////////////////
   //Event Tests
