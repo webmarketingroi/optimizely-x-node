@@ -22,6 +22,7 @@ var AUDIENCEID = hat();
 var CAMPAIGNID = hat();
 var PAGEID = hat();
 var EVENTID = hat();
+var ATTRIBUTEID = hat();
 var PROJECTNAME = "PROJECTNAME";
 var AUDIENCENAME = "AUDIENCENAME";
 var DIMENSIONNAME = "DIMENSIONNAME";
@@ -985,6 +986,145 @@ describe("Successful API Calls", function() {
         "event_id":EVENTID
       };
       client.deleteCustomEvent(options)
+        .then(
+          function(reply) {
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+  })
+  
+  //////////////////
+  //Attribute Tests
+  //////////////////
+  describe("Attributes", function() {
+    
+    scope.post('/v2/attributes') //create
+        .query(function(actualQuery){return true;})
+        .reply(201, {
+            "key" : "subscriber_status",
+            "project_id" : PROJECTID,
+            "archived" : false,
+            "description" : "string",
+            "name" : "Subscriber Status",
+            "condition_type" : "custom_attribute",
+            "id" : ATTRIBUTEID
+        });
+    
+    it('should create an attribute', function(done) {
+      var attribute = {
+           "project_id" : PROJECTID,
+            "name" : "Subscriber Status"
+      };
+      
+      client.createAttribute(attribute)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Subscriber Status");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/attributes/' + ATTRIBUTEID) //get
+        .reply(200, {
+            "key" : "subscriber_status",
+            "project_id" : PROJECTID,
+            "archived" : false,
+            "description" : "string",
+            "name" : "Subscriber Status",
+            "condition_type" : "custom_attribute",
+            "id" : ATTRIBUTEID
+        });
+      
+    it('should get an attribute', function(done) {
+      var options = {
+        "id": ATTRIBUTEID
+      }
+      client.getAttribute(options)
+        .then(
+          function(data) {
+            assert.equal(data.payload.id, ATTRIBUTEID);
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.put('/v2/attributes/' + ATTRIBUTEID) //update
+        .query(function(actualQuery){return true;})
+        .reply(202, {
+            "key" : "subscriber_status",
+            "project_id" : PROJECTID,
+            "archived" : false,
+            "description" : "string",
+            "name" : "Subscriber Status 2",
+            "condition_type" : "custom_attribute",
+            "id" : ATTRIBUTEID
+        });
+        
+    it('should update an attribute', function(done) {
+      var options = {
+        "id": ATTRIBUTEID
+      }
+      
+      var attribute = {
+          "name":"Subscriber Status 2"
+      };
+      
+      client.updateAttribute(options, attribute)
+        .then(
+          function(data) {
+            assert.equal(data.payload.name, "Subscriber Status 2");
+            done();
+          },
+          function(error) {
+            done(error);
+          }
+        )
+    });
+    
+    scope.get('/v2/attributes') //get 
+        .query(function(actualQuery){return true;})
+        .reply(200, function(uri, requestBody) {
+          return [ {
+                    "id": ATTRIBUTEID,
+                    "name": "Subscriber Status 2"
+                  } ];
+        });
+        
+    it('should return a list of attributes', function(done){
+      var options = {
+        "id": PROJECTID
+      }
+      client.getAttributes(options).then(function(data){
+        assert.equal(data.payload[0].id, ATTRIBUTEID);
+        assert.equal(data.payload[0].name, "Subscriber Status 2");
+        done();
+      }, function (error){
+        done(error);
+      })
+    });
+    
+    scope.intercept('/v2/attributes/' + ATTRIBUTEID, 'DELETE') 
+      .reply(204, function(uri, requestBody) {
+        return requestBody;
+      });
+      
+    it('should delete an attribute', function(done) {
+      var options = {
+        "id": ATTRIBUTEID
+      };
+      client.deleteAttribute(options)
         .then(
           function(reply) {
             done();
