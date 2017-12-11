@@ -1,5 +1,5 @@
 {
-  "name": "optimizely-x-node",
+  "name": "optimizely-x-node-client",
   "version": "0.1.0",
   "description": "Optimizely X Client for Node.js",
   "main": "index.js",
