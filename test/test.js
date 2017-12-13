@@ -248,7 +248,7 @@ describe("Successful API Calls", function() {
     });
     
     
-    scope.put('/v2/experiments/' + EXPERIMENTID) //update
+    scope.patch('/v2/experiments/' + EXPERIMENTID) //update
       .query(function(actualQuery){return true;})
       .reply(202, {
         "id": EXPERIMENTID,
@@ -1299,7 +1299,7 @@ describe("Unsuccessful API Calls", function() {
         )
     });
     
-    scope.put('/v2/experiments/' + EXPERIMENTID) //update
+    scope.patch('/v2/experiments/' + EXPERIMENTID) //update
       .query(function(actualQuery){return true;})
       .reply(400, function(uri, requestBody) {
         requestBody.id = stripPathEnd(uri);
